@@ -9,17 +9,19 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 import com.sample.improvedweatherapp.app.R;
-import com.sample.weatherapp.app.model.DayWeather;
-import com.sample.weatherapp.app.model.Weather;
 import com.sample.weatherapp.app.model.WeatherForecast;
 
-import java.util.List;
-
 public class FragmentForecast extends Fragment {
-    public View v;
-    String greg = "FragmentForecast";
-    ProgressBar progressBar;
+    public View mV;
+    String GREG = "FragmentForecast";
+    ProgressBar mProgressBar;
     static final String ARGUMENT_PAGE_NUMBER = "arg_page_number";
+
+    @Override
+    public void onResume() {
+
+        super.onResume();
+    }
 
     static FragmentForecast newInstance(int page) {
         FragmentForecast fragmentForecast = new FragmentForecast();
@@ -31,20 +33,19 @@ public class FragmentForecast extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(greg, "start");
-        v = inflater.inflate(R.layout.fragment_forecast, null);
-        progressBar = (ProgressBar) v.findViewById(R.id.ProgressBarFF);
+        Log.d(GREG, "start");
+        mV = inflater.inflate(R.layout.fragment_forecast, null);
+        mProgressBar = (ProgressBar) mV.findViewById(R.id.ProgressBarFF);
 
-        if (null != MainActivity.newData.getForecast()) {
-            Log.d(greg, "get data");
-            WeatherForecast forecast = MainActivity.newData.getForecast();
+        if (null != MainActivity.sNewData.getForecast()) {
+            Log.d(GREG, "get data");
+            WeatherForecast forecast = MainActivity.sNewData.getForecast();
             ForecastAdapter adapter = new ForecastAdapter(getActivity(), forecast.getList());
-            ExpandableListView elvDay = (ExpandableListView) v
+            ExpandableListView elvDay = (ExpandableListView) mV
                     .findViewById(R.id.ELday);
             elvDay.setAdapter(adapter);
-            progressBar.setVisibility(View.GONE);
+            mProgressBar.setVisibility(View.GONE);
         }
-
-        return v;
+        return mV;
     }
 }

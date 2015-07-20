@@ -10,28 +10,26 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.sample.improvedweatherapp.app.R;
-import com.sample.weatherapp.app.model.DayWeather;
-import com.sample.weatherapp.app.model.Weather;
 
 import java.util.List;
 
 public class ForecastAdapter extends BaseExpandableListAdapter {
-    List<com.sample.weatherapp.app.model.List> weathersForecast;
-    Context ctx;
-    LayoutInflater lInflater;
+    List<com.sample.weatherapp.app.model.List> mWeathersForecast;
+    Context mCtx;
+    LayoutInflater mLInflater;
     String GREG = "ForecastAdapter";
-    private ChildViewHolder childViewHolder;
-    private GroupViewHolder groupViewHolder;
+    private ChildViewHolder mChildViewHolder;
+    private GroupViewHolder mGroupViewHolder;
 
-    public ForecastAdapter(Activity ctx, List<com.sample.weatherapp.app.model.List> weathersForecast) {
-        this.weathersForecast = weathersForecast;
-        this.ctx = ctx;
-        this.lInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    public ForecastAdapter(Activity mCtx, List<com.sample.weatherapp.app.model.List> mWeathersForecast) {
+        this.mWeathersForecast = mWeathersForecast;
+        this.mCtx = mCtx;
+        this.mLInflater = (LayoutInflater) mCtx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getGroupCount() {
-        return weathersForecast.size();
+        return mWeathersForecast.size();
     }
 
     @Override
@@ -41,13 +39,13 @@ public class ForecastAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getGroup(int groupPosition) {
-        return weathersForecast.get(groupPosition);
+        return mWeathersForecast.get(groupPosition);
     }
 
     @Override
     public Object getChild(int arg0, int arg1) {
         Log.d(GREG, "getChild" + arg0);
-        return weathersForecast.get(arg0);
+        return mWeathersForecast.get(arg0);
     }
 
     @Override
@@ -72,31 +70,31 @@ public class ForecastAdapter extends BaseExpandableListAdapter {
         Log.d(GREG, "start getView: ");
         if (convertView == null) {
             Log.d(GREG, "if convertView==null: ");
-            convertView = lInflater.inflate(R.layout.list_item_day, parent, false);
-            groupViewHolder = new GroupViewHolder();
+            convertView = mLInflater.inflate(R.layout.list_item_day, parent, false);
+            mGroupViewHolder = new GroupViewHolder();
 
-            //        .setText(weathersForecast[groupPosition].date)
-            groupViewHolder.tvDate = (TextView) convertView.findViewById(R.id.tvDate);
+            //        .setText(mWeathersForecast[groupPosition].date)
+            mGroupViewHolder.tvDate = (TextView) convertView.findViewById(R.id.tvDate);
 
-            groupViewHolder.tvDayTemperature = (TextView) convertView.findViewById(R.id.tvDayTemperature);
+            mGroupViewHolder.tvDayTemperature = (TextView) convertView.findViewById(R.id.tvDayTemperature);
 
-            groupViewHolder.tvDescription = (TextView) convertView.findViewById(R.id.tvDescription);
+            mGroupViewHolder.tvDescription = (TextView) convertView.findViewById(R.id.tvDescription);
 
-//        .setImageResource(weathersForecast[groupPosition].imageId)
-            groupViewHolder.imDay = (ImageView) convertView.findViewById(R.id.imDay);
-            convertView.setTag(groupViewHolder);
+//        .setImageResource(mWeathersForecast[groupPosition].imageId)
+            mGroupViewHolder.imDay = (ImageView) convertView.findViewById(R.id.imDay);
+            convertView.setTag(mGroupViewHolder);
         } else {
-            groupViewHolder = (GroupViewHolder) convertView.getTag();
+            mGroupViewHolder = (GroupViewHolder) convertView.getTag();
         }
 
-        com.sample.weatherapp.app.model.List dayForecast = weathersForecast.get(groupPosition);
+        com.sample.weatherapp.app.model.List dayForecast = mWeathersForecast.get(groupPosition);
 
         if (dayForecast != null) {
-            groupViewHolder.tvDate.setText(dayForecast.getDt());
-            groupViewHolder.tvDayTemperature.setText(
+            mGroupViewHolder.tvDate.setText(dayForecast.getDt());
+            mGroupViewHolder.tvDayTemperature.setText(
                     dayForecast.getTemp().getDay() + "..." + dayForecast.getTemp().getNight() + "C");
-            groupViewHolder.tvDescription.setText(dayForecast.getWeather().get(0).getDescription());
-            groupViewHolder.imDay.setImageResource(dayForecast.getWeather().get(0).getId());
+            mGroupViewHolder.tvDescription.setText(dayForecast.getWeather().get(0).getDescription());
+            mGroupViewHolder.imDay.setImageResource(dayForecast.getWeather().get(0).getId());
         }
 
         Log.d(GREG, "start try at getView ");
@@ -109,31 +107,31 @@ public class ForecastAdapter extends BaseExpandableListAdapter {
         Log.d(GREG, "start getChildView: ");
         if (convertView == null) {
             Log.d(GREG, "if viewA==null: ");
-            convertView = lInflater.inflate(R.layout.extendable_list_item_day,
+            convertView = mLInflater.inflate(R.layout.extendable_list_item_day,
                     parent, false);
-            childViewHolder = new ChildViewHolder();
-            childViewHolder.elTvMornTemperature = (TextView) convertView.findViewById(R.id.ELtvMornTemperature);
-            childViewHolder.elTvDayTemperature = (TextView) convertView.findViewById(R.id.ELtvDayTemperature);
-            childViewHolder.elTvNightTemperature = (TextView) convertView.findViewById(R.id.ELtvNightTemperature);
-            childViewHolder.elTvEveTemperature = (TextView) convertView.findViewById(R.id.ELtvEveTemperature);
-            childViewHolder.elTvWindSpeed = (TextView) convertView.findViewById(R.id.ELtvWindSpeed);
-            childViewHolder.elTvHumidity = (TextView) convertView.findViewById(R.id.ELtvHumidity);
-            childViewHolder.elTvPressure = (TextView) convertView.findViewById(R.id.ELtvPressure);
-            convertView.setTag(childViewHolder);
+            mChildViewHolder = new ChildViewHolder();
+            mChildViewHolder.elTvMornTemperature = (TextView) convertView.findViewById(R.id.ELtvMornTemperature);
+            mChildViewHolder.elTvDayTemperature = (TextView) convertView.findViewById(R.id.ELtvDayTemperature);
+            mChildViewHolder.elTvNightTemperature = (TextView) convertView.findViewById(R.id.ELtvNightTemperature);
+            mChildViewHolder.elTvEveTemperature = (TextView) convertView.findViewById(R.id.ELtvEveTemperature);
+            mChildViewHolder.elTvWindSpeed = (TextView) convertView.findViewById(R.id.ELtvWindSpeed);
+            mChildViewHolder.elTvHumidity = (TextView) convertView.findViewById(R.id.ELtvHumidity);
+            mChildViewHolder.elTvPressure = (TextView) convertView.findViewById(R.id.ELtvPressure);
+            convertView.setTag(mChildViewHolder);
         } else {
-            childViewHolder = (ChildViewHolder) convertView.getTag();
+            mChildViewHolder = (ChildViewHolder) convertView.getTag();
         }
 
-//        DayWeather dayWeather = weathersForecast[groupPosition];
-        com.sample.weatherapp.app.model.List dayWeather = weathersForecast.get(groupPosition);
+//        DayWeather dayWeather = mWeathersForecast[groupPosition];
+        com.sample.weatherapp.app.model.List dayWeather = mWeathersForecast.get(groupPosition);
         if (dayWeather != null) {
-            childViewHolder.elTvMornTemperature.setText(dayWeather.getTemp().getMorn().toString());
-            childViewHolder.elTvDayTemperature.setText(dayWeather.getTemp().getDay().toString());
-            childViewHolder.elTvNightTemperature.setText(dayWeather.getTemp().getNight().toString());
-            childViewHolder.elTvEveTemperature.setText(dayWeather.getTemp().getEve().toString());
-            childViewHolder.elTvWindSpeed.setText(dayWeather.getSpeed().toString());
-            childViewHolder.elTvHumidity.setText(dayWeather.getHumidity().toString());
-            childViewHolder.elTvPressure.setText(dayWeather.getPressure().toString());
+            mChildViewHolder.elTvMornTemperature.setText(dayWeather.getTemp().getMorn().toString());
+            mChildViewHolder.elTvDayTemperature.setText(dayWeather.getTemp().getDay().toString());
+            mChildViewHolder.elTvNightTemperature.setText(dayWeather.getTemp().getNight().toString());
+            mChildViewHolder.elTvEveTemperature.setText(dayWeather.getTemp().getEve().toString());
+            mChildViewHolder.elTvWindSpeed.setText(dayWeather.getSpeed().toString());
+            mChildViewHolder.elTvHumidity.setText(dayWeather.getHumidity().toString());
+            mChildViewHolder.elTvPressure.setText(dayWeather.getPressure().toString());
         }
 
         Log.d(GREG, "start try at getView ");

@@ -1,9 +1,7 @@
 package com.sample.weatherapp.app.activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.location.Criteria;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.Spanned;
@@ -20,15 +18,15 @@ import com.sample.weatherapp.app.util.GPSTracker;
 
 public class LocationActivity extends Activity implements OnClickListener, LocationListener {
 
-    private final String GREG = "locationActivity";
-    Activity locationActivity = this;
-    private AutoCompleteTextView tvEnterCity;
-    private EditText lat;
-    private EditText lon;
-    private LocationManager locationManager;
-    private String provider;
-    GPSTracker gps;
-    private boolean fromMain;
+    private final String GREG = "mLocationActivity";
+    Activity mLocationActivity = this;
+    private AutoCompleteTextView mTvEnterCity;
+    private EditText mLat;
+    private EditText mLon;
+    private LocationManager mLocationManager;
+    private String mProvider;
+    GPSTracker mGps;
+    private boolean mFromMain;
 
     private String formatLocation(Location location) {
         if (location == null) return "";
@@ -48,26 +46,26 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
 
         Intent intent = getIntent();
         String checkFlag = intent.getStringExtra("flag");
-        if (checkFlag != null && checkFlag.equals("Main")) fromMain = true;
+        if (checkFlag != null && checkFlag.equals("Main")) mFromMain = true;
 
-        tvEnterCity = (AutoCompleteTextView) findViewById(R.id.autoCompleteCity);
+        mTvEnterCity = (AutoCompleteTextView) findViewById(R.id.autoCompleteCity);
         String[] cities = getResources().getStringArray(R.array.city);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_dropdown_item_1line, cities);
-        tvEnterCity.setAdapter(adapter);
+        mTvEnterCity.setAdapter(adapter);
 
         Button btnSearchByCity = (Button) findViewById(R.id.btnSearchByCity);
         btnSearchByCity.setOnClickListener(this);
 
-        lat = (EditText) findViewById(R.id.editLat);
-        lon = (EditText) findViewById(R.id.editLon);
+        mLat = (EditText) findViewById(R.id.editLat);
+        mLon = (EditText) findViewById(R.id.editLon);
 
         InputFilter filter = new InputFilter() {
             @Override
             public CharSequence filter(CharSequence source, int start, int end,
                                        Spanned dest, int dstart, int dend) {
-                Toast toast = Toast.makeText(locationActivity,
+                Toast toast = Toast.makeText(mLocationActivity,
                         "Пишите на английском",
                         Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.TOP, 0, 0);
@@ -88,13 +86,13 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
                     return true;
             }
         };
-        tvEnterCity.setFilters(new InputFilter[]{filter});
+        mTvEnterCity.setFilters(new InputFilter[]{filter});
 
         // Get the location manager
-        /*gps = new GPSTracker(LocationActivity.this);
-        if (gps.canGetLocation()) {
-            lat.setText(Double.toString(gps.getLatitude()));
-            lon.setText(String.valueOf(gps.getLongitude()));
+        /*mGps = new GPSTracker(LocationActivity.this);
+        if (mGps.canGetLocation()) {
+            mLat.setText(Double.toString(mGps.getLatitude()));
+            mLon.setText(String.valueOf(mGps.getLongitude()));
         }*/
         Button btnSearchByCrd = (Button) findViewById(R.id.btnSearchByCrd);
         btnSearchByCrd.setOnClickListener(this);
@@ -103,8 +101,8 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
     public void onLocationChanged(Location location) {
         int latitude = (int) (location.getLatitude());
         int longitude = (int) (location.getLongitude());
-        lat.setText(String.valueOf(latitude));
-        lon.setText(String.valueOf(longitude));
+        mLat.setText(String.valueOf(latitude));
+        mLon.setText(String.valueOf(longitude));
     }
 
     @Override
@@ -114,13 +112,13 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
 
     @Override
     public void onProviderEnabled(String s) {
-        Toast.makeText(this, "Enabled new provider " + provider,
+        Toast.makeText(this, "Enabled new mProvider " + mProvider,
                 Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onProviderDisabled(String s) {
-        Toast.makeText(this, "Disabled provider " + provider,
+        Toast.makeText(this, "Disabled mProvider " + mProvider,
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -132,31 +130,31 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
     @Override
     protected void onPause() {
         super.onPause();
-//        locationManager.removeUpdates(this);
+//        mLocationManager.removeUpdates(this);
     }
 
     @Override
     public void onClick(View v) {
         Intent intent = null;
-        if (fromMain) intent = new Intent();
+        if (mFromMain) intent = new Intent();
         else intent = new Intent(this, MainActivity.class);
         switch (v.getId()) {
             case R.id.btnSearchByCity:
-                String str = tvEnterCity.getText().toString();
+                String str = mTvEnterCity.getText().toString();
                 Log.d(GREG, "read city " + str);
                 intent.putExtra("city", str);
                 setResult(1, intent);
                 break;
             case R.id.btnSearchByCrd:
-                String lat = this.lat.getText().toString();
-                String lon = this.lon.getText().toString();
-                Log.d(GREG, "read lat " + lat + "lon " + lon);
-                intent.putExtra("lat", lat);
-                intent.putExtra("lon", lon);
+                String lat = this.mLat.getText().toString();
+                String lon = this.mLon.getText().toString();
+                Log.d(GREG, "read mLat " + lat + "mLon " + lon);
+                intent.putExtra("mLat", lat);
+                intent.putExtra("mLon", lon);
                 setResult(2, intent);
                 break;
         }
-        if (!fromMain) startActivity(intent);
+        if (!mFromMain) startActivity(intent);
         finish();
     }
 }

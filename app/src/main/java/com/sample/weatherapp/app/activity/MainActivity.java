@@ -25,7 +25,6 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.sample.improvedweatherapp.app.R;
 import com.sample.weatherapp.app.model.*;
-import com.sample.weatherapp.app.util.JsonParserUtil;
 import com.sample.weatherapp.app.util.MyListener;
 
 import java.util.*;
@@ -34,38 +33,38 @@ import java.util.List;
 public class MainActivity extends FragmentActivity {
 
     static final String TAG = "MainActivity";
-    public static Data newData;
-
     static final int PAGE_COUNT = 2;
-    ViewPager pager;
-    PagerAdapter pagerAdapter;
-    public ImageView imv;
-    boolean refreshAnim = false;
-    MenuItem refreshItem;
-    public boolean visibleOnScreen = false;
-    public boolean showNewData = false;
+
+    public static Data sNewData;
+    ViewPager mPager;
+    PagerAdapter mPagerAdapter;
+    public ImageView mImv;
+    boolean mRefreshAnim = false;
+    MenuItem mRefreshItem;
+    public boolean mVisibleOnScreen = false;
+    public boolean mShowNewData = false;
     public SharedPreferences mSettings;
     private static final String GREG = "mainActivity";
-    RequestQueue queue;
-    JsonObjectRequest currentWeatherRequest;
-    JsonObjectRequest forecastRequest;
+    RequestQueue mQueue;
+    JsonObjectRequest mCurrentWeatherRequest;
+    JsonObjectRequest mForecastRequest;
 
     @Override
     protected void onPause() {
         super.onPause();
         Log.d(GREG, "onPause");
-        visibleOnScreen = false;
+        mVisibleOnScreen = false;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.d(GREG, "onResume");
-        if (showNewData) {
+        if (mShowNewData) {
             afterUrlTask();
-            showNewData = false;
+            mShowNewData = false;
         }
-        visibleOnScreen = true;
+        mVisibleOnScreen = true;
     }
 
     @Override
@@ -74,21 +73,28 @@ public class MainActivity extends FragmentActivity {
         Log.d(GREG, "OnCreate");
         setContentView(R.layout.first_activity);
 
-        queue = Volley.newRequestQueue(this);
-        pager = (ViewPager) findViewById(R.id.pager);
+        mQueue = Volley.newRequestQueue(this);
+        mPager = (ViewPager) findViewById(R.id.pager);
         List<Fragment> fragments = new ArrayList<Fragment>();
         fragments.add(FragmentNow.newInstance(0));
         fragments.add(FragmentForecast.newInstance(1));
-        pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager(), fragments);
-        pager.setAdapter(pagerAdapter);
+        mPagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager(), this);
+        mPager.setAdapter(mPagerAdapter);
 
-        final ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
+        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+            private Fragment mFragment;
+
 
             @Override
             public void onPageSelected(int position) {
-                Log.d(TAG, "onPageSelected, position = " + position);
-                pagerAdapter.notifyDataSetChanged();
 
+//                Log.d(TAG, "onPageSelected, position = " + position);
+//                Fragment.instantiate(MainActivity.this, "FragmentNow");
+                /*Fragment fragment = ((FragmentPagerAdapter) mPager.getAdapter()).getItem(position);
+                if (fragment != null) {
+                    fragment.onResume();
+                }*/
             }
 
             @Override
@@ -99,24 +105,15 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void onPageScrollStateChanged(int state) {
             }
-        };
-        pager.addOnPageChangeListener(onPageChangeListener);
-        onPageChangeListener.onPageSelected(pager.getCurrentItem());
-        pager.post(new Runnable(){
-
-            @Override
-            public void run() {
-                onPageChangeListener.onPageSelected(pager.getCurrentItem());
-            }
         });
 
         mSettings = getSharedPreferences("LAST_DATA", Context.MODE_PRIVATE);
-        newData = new Data();
+        sNewData = new Data();
         if (mSettings.contains("title")) {            // get last save data
             Log.d(GREG, "get last save data");
-            newData.title = mSettings.getString("title", null);
-            newData.urlStrDay = mSettings.getString("urlStrDay", null);
-            newData.urlStrForecast = mSettings
+            sNewData.title = mSettings.getString("title", null);
+            sNewData.urlStrDay = mSettings.getString("urlStrDay", null);
+            sNewData.urlStrForecast = mSettings
                     .getString("urlStrForecast", null);
 
             DayWeather dw;
@@ -125,12 +122,12 @@ public class MainActivity extends FragmentActivity {
                 Gson gson = new Gson();
 
                 dw = gson.fromJson(mSettings.getString("jsonDay", null), DayWeather.class);
-                newData.setNowWeather(dw);
+                sNewData.setNowWeather(dw);
 
                 WeatherForecast weatherForecast = gson.fromJson(mSettings.getString(
                         "jsonForecast", null), WeatherForecast.class);
 
-                newData.setForecast(weatherForecast);
+                sNewData.setForecast(weatherForecast);
             } catch (RuntimeException e) {
                 e.printStackTrace();
             }
@@ -143,11 +140,30 @@ public class MainActivity extends FragmentActivity {
     }
 
     private class MyFragmentPagerAdapter extends FragmentStatePagerAdapter {
-        private java.util.List<Fragment> fragments;
+        private Map<Integer, String> mFragmentTags;
+        private FragmentManager mFragmentManager;
 
-        public MyFragmentPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
+        public MyFragmentPagerAdapter(FragmentManager fm, Context context) {
             super(fm);
-            this.fragments = fragments;
+            mFragmentManager = fm;
+            mFragmentTags = new HashMap<Integer, String>();
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Object obj = super.instantiateItem(container, position);
+            if (obj instanceof Fragment) {
+                Fragment f = (Fragment) obj;
+                String tag = f.getTag();
+                mFragmentTags.put(position, tag);
+            }
+            return obj;
+        }
+
+        public Fragment getFragment(int position) {
+            String tag = mFragmentTags.get(position);
+            if (tag == null) return null;
+            return mFragmentManager.findFragmentByTag(tag);
         }
 
         @Override
@@ -157,12 +173,20 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return this.fragments.get(position);
+            switch (position) {
+                case 0:
+                    return FragmentNow.newInstance(position);
+                case 1:
+                    return FragmentForecast.newInstance(position);
+                default:
+                    break;
+            }
+            return null;
         }
 
         @Override
         public int getCount() {
-            return this.fragments.size();
+            return PAGE_COUNT;
         }
 
         @Override
@@ -186,31 +210,31 @@ public class MainActivity extends FragmentActivity {
         Log.d("anim", "onCreateOptionsMenu");
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        if (null == refreshItem) {
+        if (null == mRefreshItem) {
             // first time create menu
-            refreshItem = menu.findItem(R.id.refresh);
+            mRefreshItem = menu.findItem(R.id.refresh);
             return true;
         }
 
-//        MenuItemCompat.getActionView(refreshItem)
-        if (!refreshAnim && null != refreshItem.getActionView()) {
+//        MenuItemCompat.getActionView(mRefreshItem)
+        if (!mRefreshAnim && null != mRefreshItem.getActionView()) {
             // stop animation
             Log.d("anim", "set action view null");
-            refreshItem.getActionView().clearAnimation();
+            mRefreshItem.getActionView().clearAnimation();
             return true;
         } else {
             // start animation
-            refreshItem = menu.findItem(R.id.refresh);
+            mRefreshItem = menu.findItem(R.id.refresh);
             LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            imv = (ImageView) inflater.inflate(R.layout.imv_refresh, null);
+            mImv = (ImageView) inflater.inflate(R.layout.imv_refresh, null);
             Animation an = AnimationUtils.loadAnimation(this,
                     R.anim.loadingrotate);
             an.setRepeatCount(Animation.INFINITE);
-            imv.startAnimation(an);
+            mImv.startAnimation(an);
 
-            Log.d("anim", "set action view imv");
-            MenuItemCompat.setActionView(refreshItem, imv);
-            refreshItem.setIcon(null);
+            Log.d("anim", "set action view mImv");
+            MenuItemCompat.setActionView(mRefreshItem, mImv);
+            mRefreshItem.setIcon(null);
             return true;
         }
     }
@@ -238,8 +262,8 @@ public class MainActivity extends FragmentActivity {
 
     private void refresh() {
         // enough data to query
-        if (null == newData.urlStrForecast || null == newData.urlStrDay
-                || null == newData.title) {
+        if (null == sNewData.urlStrForecast || null == sNewData.urlStrDay
+                || null == sNewData.title) {
 
             Toast.makeText(this, "�������� �����", Toast.LENGTH_LONG).show();
 
@@ -248,19 +272,20 @@ public class MainActivity extends FragmentActivity {
         stopQuery();
 
         // start new query with last data
-        queue.add(currentWeatherRequest);
-        queue.add(forecastRequest);
+        mQueue.add(mCurrentWeatherRequest);
+        mQueue.add(mForecastRequest);
     }
 
     public void afterUrlTask() {
-        if (pager != null) {
-            pager.setCurrentItem(0);
-//            bar.setTitle(newData.title);
+        if (mPager != null) {
+            mPagerAdapter.notifyDataSetChanged();
+            mPager.setCurrentItem(0);
+//            bar.setTitle(sNewData.title);
         }
     }
 
     private void stopQuery() {// stop another query
-        /*if (null != queue
+        /*if (null != mQueue
                 && (!dataHandler.isCancelled() || AsyncTask.Status.FINISHED != dataHandler
                 .getStatus()))
             dataHandler.cancel(false);*/
@@ -274,34 +299,34 @@ public class MainActivity extends FragmentActivity {
         MyListener forecastListener = null;
         switch (resultCode) {
             case 1:
-                final String city = intent.getStringExtra("city");
+                final String city = intent.getStringExtra("mCity");
 
                 // save query string and title to refresh data next time
-                newData.urlStrDay = newData.STR_CURRENT_WEATHER + "q=" + newData.city;
-                newData.urlStrForecast = newData.STR_FORECAST + "q=" + newData.city + "&cnt=14";
-                newData.city = city;
+                sNewData.urlStrDay = sNewData.STR_CURRENT_WEATHER + "q=" + city;
+                sNewData.urlStrForecast = sNewData.STR_FORECAST + "q=" + city + "&cnt=14";
+                sNewData.city = city;
 
-                Log.d(GREG, "city " + city);
+                Log.d(GREG, "mCity " + city);
 //                stop other queries
                 stopQuery();
                 Log.d(GREG, "request by city");
 
-                currentWeatherListener = new MyListener(newData, WeatherType.CURRENT_WEATHER, this);
-                forecastListener = new MyListener(newData, WeatherType.FORECAST, this);
+                currentWeatherListener = new MyListener(sNewData, WeatherType.CURRENT_WEATHER, this);
+                forecastListener = new MyListener(sNewData, WeatherType.FORECAST, this);
 
                 break;
             case 2:
                 // start new query with coordinate
-                newData.lat = intent.getStringExtra("lat");
-                newData.lon = intent.getStringExtra("lon");
-                newData.urlStrDay = newData.STR_CURRENT_WEATHER + "lat=" + newData.lat + "&lon=" + newData.lon;
-                newData.urlStrForecast = newData.STR_FORECAST + "lat="
-                                         + newData.lat + "&lon=" + newData.lon + "&cnt=14";
+                sNewData.lat = intent.getStringExtra("lat");
+                sNewData.lon = intent.getStringExtra("lon");
+                sNewData.urlStrDay = sNewData.STR_CURRENT_WEATHER + "lat=" + sNewData.lat + "&lon=" + sNewData.lon;
+                sNewData.urlStrForecast = sNewData.STR_FORECAST + "lat="
+                        + sNewData.lat + "&lon=" + sNewData.lon + "&cnt=14";
                 Log.d(GREG, "request by lat and lon");
 //              stop other queries
                 stopQuery();
-                currentWeatherListener = new MyListener(newData, WeatherType.CURRENT_WEATHER, this);
-                forecastListener = new MyListener(newData, WeatherType.FORECAST, this);
+                currentWeatherListener = new MyListener(sNewData, WeatherType.CURRENT_WEATHER, this);
+                forecastListener = new MyListener(sNewData, WeatherType.FORECAST, this);
                 break;
         }
 
@@ -312,30 +337,30 @@ public class MainActivity extends FragmentActivity {
             }
         };
 
-        currentWeatherRequest = new JsonObjectRequest(
-                Request.Method.GET, newData.urlStrDay, (String) null, currentWeatherListener, myErrorListener);
+        mCurrentWeatherRequest = new JsonObjectRequest(
+                Request.Method.GET, sNewData.urlStrDay, (String) null, currentWeatherListener, myErrorListener);
 
-        forecastRequest = new JsonObjectRequest(
-                Request.Method.GET, newData.urlStrForecast, (String) null, forecastListener, myErrorListener);
+        mForecastRequest = new JsonObjectRequest(
+                Request.Method.GET, sNewData.urlStrForecast, (String) null, forecastListener, myErrorListener);
 
-        queue.add(currentWeatherRequest);
-        queue.add(forecastRequest);
+        mQueue.add(mCurrentWeatherRequest);
+        mQueue.add(mForecastRequest);
     }
 
     public void loadAnimationStart() {
         // start loading animation
-        if (!refreshAnim) {
+        if (!mRefreshAnim) {
             Log.d("anim", "animation successful start ");
-            refreshAnim = true;
+            mRefreshAnim = true;
             supportInvalidateOptionsMenu();
         }
     }
 
     public void loadAnimationStop() {
         // stop loading animation
-        if (refreshAnim) {
+        if (mRefreshAnim) {
             Log.d("anim", "animation successful stop");
-            refreshAnim = false;
+            mRefreshAnim = false;
             supportInvalidateOptionsMenu();
         }
     }
