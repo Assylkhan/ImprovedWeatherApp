@@ -1,7 +1,9 @@
 package com.sample.weatherapp.app.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.Spanned;
@@ -19,14 +21,15 @@ import com.sample.weatherapp.app.util.GPSTracker;
 public class LocationActivity extends Activity implements OnClickListener, LocationListener {
 
     private final String GREG = "mLocationActivity";
-    Activity mLocationActivity = this;
+    private Activity mLocationActivity = this;
     private AutoCompleteTextView mTvEnterCity;
     private EditText mLat;
     private EditText mLon;
     private LocationManager mLocationManager;
     private String mProvider;
-    GPSTracker mGps;
+    private GPSTracker mGps;
     private boolean mFromMain;
+    public SharedPreferences mSettings;
 
     private String formatLocation(Location location) {
         if (location == null) return "";
@@ -60,6 +63,19 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
 
         mLat = (EditText) findViewById(R.id.editLat);
         mLon = (EditText) findViewById(R.id.editLon);
+
+        mSettings = getSharedPreferences("LAST_DATA", Context.MODE_PRIVATE);
+        if (mSettings.contains("title")){
+            String city = mSettings.getString("city", null);
+            String lat = mSettings.getString("lat", null);
+            String lon = mSettings.getString("lon", null);
+            if (city != null && !city.isEmpty()){
+                mTvEnterCity.setText(city);
+            } else {
+                mLat.setText(lat);
+                mLon.setText(lon);
+            }
+        }
 
         InputFilter filter = new InputFilter() {
             @Override

@@ -55,6 +55,10 @@ public class MyListener<JSONObject> implements Response.Listener<JSONObject> {
 
         SharedPreferences.Editor editor = mMainActivity.mSettings.edit();
         editor.putString("title", mMainActivity.sNewData.title);
+        editor.putString("city", mMainActivity.sNewData.city);
+        editor.putString("lat", mMainActivity.sNewData.lat);
+        editor.putString("lon", mMainActivity.sNewData.lon);
+
         editor.putString("urlStrDay", mMainActivity.sNewData.urlStrDay);
         editor.putString("urlStrForecast", mMainActivity.sNewData.urlStrForecast);
 

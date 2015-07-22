@@ -32,34 +32,36 @@ import java.util.List;
 
 public class MainActivity extends FragmentActivity {
 
-    static final String TAG = "MainActivity";
-    static final int PAGE_COUNT = 2;
+    private static final String TAG = "mainActivity";
+    private static final int PAGE_COUNT = 2;
 
     public static Data sNewData;
-    ViewPager mPager;
-    PagerAdapter mPagerAdapter;
+//    todo: from friendly to private
+    private ViewPager mPager;
+//    todo: from friendly to private
+    private PagerAdapter mPagerAdapter;
     public ImageView mImv;
-    boolean mRefreshAnim = false;
-    MenuItem mRefreshItem;
+    public boolean mRefreshAnim = false;
+    public MenuItem mRefreshItem;
     public boolean mVisibleOnScreen = false;
+
     public boolean mShowNewData = false;
     public SharedPreferences mSettings;
-    private static final String GREG = "mainActivity";
-    RequestQueue mQueue;
-    JsonObjectRequest mCurrentWeatherRequest;
-    JsonObjectRequest mForecastRequest;
+    private RequestQueue mQueue;
+    private JsonObjectRequest mCurrentWeatherRequest;
+    private JsonObjectRequest mForecastRequest;
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(GREG, "onPause");
+        Log.d(TAG, "onPause");
         mVisibleOnScreen = false;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(GREG, "onResume");
+        Log.d(TAG, "onResume");
         if (mShowNewData) {
             afterUrlTask();
             mShowNewData = false;
@@ -70,7 +72,7 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(GREG, "OnCreate");
+        Log.d(TAG, "OnCreate");
         setContentView(R.layout.first_activity);
 
         mQueue = Volley.newRequestQueue(this);
@@ -110,7 +112,7 @@ public class MainActivity extends FragmentActivity {
         mSettings = getSharedPreferences("LAST_DATA", Context.MODE_PRIVATE);
         sNewData = new Data();
         if (mSettings.contains("title")) {            // get last save data
-            Log.d(GREG, "get last save data");
+            Log.d(TAG, "get last save data");
             sNewData.title = mSettings.getString("title", null);
             sNewData.urlStrDay = mSettings.getString("urlStrDay", null);
             sNewData.urlStrForecast = mSettings
@@ -118,7 +120,7 @@ public class MainActivity extends FragmentActivity {
 
             DayWeather dw;
             try {
-                Log.d(GREG, "try pars from last data");
+                Log.d(TAG, "try pars from last data");
                 Gson gson = new Gson();
 
                 dw = gson.fromJson(mSettings.getString("jsonDay", null), DayWeather.class);
@@ -134,7 +136,7 @@ public class MainActivity extends FragmentActivity {
         } else {
 
             // ask user chose city or coordinate
-            Log.d(GREG, "startChangeActivity");
+            Log.d(TAG, "startChangeActivity");
             startChangeActivity();
         }
     }
@@ -253,7 +255,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     public void startChangeActivity() {
-        Log.d(GREG, "startChangeActivity");
+        Log.d(TAG, "startChangeActivity");
         Intent intent = new Intent(this, LocationActivity.class);
         intent.putExtra("flag", "Main");
         startActivityForResult(intent, 1);
@@ -294,22 +296,22 @@ public class MainActivity extends FragmentActivity {
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        Log.d(GREG, "onActivityResult");
+        Log.d(TAG, "onActivityResult");
         MyListener currentWeatherListener = null;
         MyListener forecastListener = null;
         switch (resultCode) {
             case 1:
-                final String city = intent.getStringExtra("mCity");
+                final String city = intent.getStringExtra("city");
 
                 // save query string and title to refresh data next time
                 sNewData.urlStrDay = sNewData.STR_CURRENT_WEATHER + "q=" + city;
                 sNewData.urlStrForecast = sNewData.STR_FORECAST + "q=" + city + "&cnt=14";
                 sNewData.city = city;
 
-                Log.d(GREG, "mCity " + city);
+                Log.d(TAG, "mCity " + city);
 //                stop other queries
                 stopQuery();
-                Log.d(GREG, "request by city");
+                Log.d(TAG, "request by city");
 
                 currentWeatherListener = new MyListener(sNewData, WeatherType.CURRENT_WEATHER, this);
                 forecastListener = new MyListener(sNewData, WeatherType.FORECAST, this);
@@ -322,7 +324,7 @@ public class MainActivity extends FragmentActivity {
                 sNewData.urlStrDay = sNewData.STR_CURRENT_WEATHER + "lat=" + sNewData.lat + "&lon=" + sNewData.lon;
                 sNewData.urlStrForecast = sNewData.STR_FORECAST + "lat="
                         + sNewData.lat + "&lon=" + sNewData.lon + "&cnt=14";
-                Log.d(GREG, "request by lat and lon");
+                Log.d(TAG, "request by lat and lon");
 //              stop other queries
                 stopQuery();
                 currentWeatherListener = new MyListener(sNewData, WeatherType.CURRENT_WEATHER, this);
