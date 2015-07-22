@@ -20,7 +20,8 @@ import com.sample.weatherapp.app.util.GPSTracker;
 
 public class LocationActivity extends Activity implements OnClickListener, LocationListener {
 
-    private final String GREG = "mLocationActivity";
+    private final String GREG = "LocationActivity";
+    public static final String FLAG = "flag";
     private Activity mLocationActivity = this;
     private AutoCompleteTextView mTvEnterCity;
     private EditText mLat;
@@ -30,6 +31,10 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
     private GPSTracker mGps;
     private boolean mFromMain;
     public SharedPreferences mSettings;
+
+//    public static Intent createIntent(Context context, int flag) { // flag - public static final int в LocationActivity
+//        return new Intent(context, LocationActivity.class).putExtra(EXTRA_FLAG, flag);
+//    }
 
     private String formatLocation(Location location) {
         if (location == null) return "";
@@ -48,8 +53,7 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
         setContentView(R.layout.activity_location);
 
         Intent intent = getIntent();
-        String checkFlag = intent.getStringExtra("flag");
-        if (checkFlag != null && checkFlag.equals("Main")) mFromMain = true;
+        mFromMain = intent.getBooleanExtra(FLAG, false);
 
         mTvEnterCity = (AutoCompleteTextView) findViewById(R.id.autoCompleteCity);
         String[] cities = getResources().getStringArray(R.array.city);
@@ -65,11 +69,11 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
         mLon = (EditText) findViewById(R.id.editLon);
 
         mSettings = getSharedPreferences("LAST_DATA", Context.MODE_PRIVATE);
-        if (mSettings.contains("title")){
+        if (mSettings.contains("title")) {
             String city = mSettings.getString("city", null);
             String lat = mSettings.getString("lat", null);
             String lon = mSettings.getString("lon", null);
-            if (city != null && !city.isEmpty()){
+            if (city != null && !city.isEmpty()) {
                 mTvEnterCity.setText(city);
             } else {
                 mLat.setText(lat);
@@ -156,14 +160,27 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
         else intent = new Intent(this, MainActivity.class);
         switch (v.getId()) {
             case R.id.btnSearchByCity:
-                String str = mTvEnterCity.getText().toString();
-                Log.d(GREG, "read city " + str);
-                intent.putExtra("city", str);
+                String city = mTvEnterCity.getText().toString();
+                if (city == null || city.isEmpty()) {
+                    mTvEnterCity.setError("заполните поле");
+                    return;
+                }
+                Log.d(GREG, "read city " + city);
+                intent.putExtra("city", city);
                 setResult(1, intent);
                 break;
             case R.id.btnSearchByCrd:
                 String lat = this.mLat.getText().toString();
                 String lon = this.mLon.getText().toString();
+                if (lat == null || lat.isEmpty()) {
+                    mLat.setError("заполните поле");
+                }
+                if (lon == null || lon.isEmpty()) {
+                    mLon.setError("заполните поле");
+                }
+                if (lat == null || lat.isEmpty() || lon == null || lon.isEmpty()) {
+                    return;
+                }
                 Log.d(GREG, "read mLat " + lat + "mLon " + lon);
                 intent.putExtra("mLat", lat);
                 intent.putExtra("mLon", lon);

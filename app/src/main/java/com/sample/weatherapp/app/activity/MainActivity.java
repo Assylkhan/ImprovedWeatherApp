@@ -32,8 +32,9 @@ import java.util.List;
 
 public class MainActivity extends FragmentActivity {
 
-    private static final String TAG = "mainActivity";
-    private static final int PAGE_COUNT = 2;
+    public static final String TAG = "mainActivity";
+    public static final int PAGE_COUNT = 2;
+    public static final boolean FROM_MAIN = true;
 
     public static Data sNewData;
 //    todo: from friendly to private
@@ -44,6 +45,7 @@ public class MainActivity extends FragmentActivity {
     public boolean mRefreshAnim = false;
     public MenuItem mRefreshItem;
     public boolean mVisibleOnScreen = false;
+    public Response.ErrorListener myErrorListener;
 
     public boolean mShowNewData = false;
     public SharedPreferences mSettings;
@@ -87,7 +89,6 @@ public class MainActivity extends FragmentActivity {
 
             private Fragment mFragment;
 
-
             @Override
             public void onPageSelected(int position) {
 
@@ -109,6 +110,13 @@ public class MainActivity extends FragmentActivity {
             }
         });
 
+        myErrorListener = new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // TODO Auto-generated method stub
+            }
+        };
+
         mSettings = getSharedPreferences("LAST_DATA", Context.MODE_PRIVATE);
         sNewData = new Data();
         if (mSettings.contains("title")) {            // get last save data
@@ -117,6 +125,19 @@ public class MainActivity extends FragmentActivity {
             sNewData.urlStrDay = mSettings.getString("urlStrDay", null);
             sNewData.urlStrForecast = mSettings
                     .getString("urlStrForecast", null);
+
+            sNewData.city = mSettings.getString("city", null);
+            sNewData.lat = mSettings.getString("lat", null);
+            sNewData.lon = mSettings.getString("lon", null);
+
+            MyListener currentWeatherListener = new MyListener(sNewData, WeatherType.CURRENT_WEATHER, this);
+            MyListener forecastListener = new MyListener(sNewData, WeatherType.FORECAST, this);
+
+            mCurrentWeatherRequest = new JsonObjectRequest(
+                    Request.Method.GET, sNewData.urlStrDay, (String) null, currentWeatherListener, myErrorListener);
+
+            mForecastRequest = new JsonObjectRequest(
+                    Request.Method.GET, sNewData.urlStrForecast, (String) null, forecastListener, myErrorListener);
 
             DayWeather dw;
             try {
@@ -209,7 +230,7 @@ public class MainActivity extends FragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         super.onCreateOptionsMenu(menu);
-        Log.d("anim", "onCreateOptionsMenu");
+        Log.d(TAG, "onCreateOptionsMenu");
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         if (null == mRefreshItem) {
@@ -221,7 +242,7 @@ public class MainActivity extends FragmentActivity {
 //        MenuItemCompat.getActionView(mRefreshItem)
         if (!mRefreshAnim && null != mRefreshItem.getActionView()) {
             // stop animation
-            Log.d("anim", "set action view null");
+            Log.d(TAG, "set action view null");
             mRefreshItem.getActionView().clearAnimation();
             return true;
         } else {
@@ -234,7 +255,7 @@ public class MainActivity extends FragmentActivity {
             an.setRepeatCount(Animation.INFINITE);
             mImv.startAnimation(an);
 
-            Log.d("anim", "set action view mImv");
+            Log.d(TAG, "set action view mImv");
             MenuItemCompat.setActionView(mRefreshItem, mImv);
             mRefreshItem.setIcon(null);
             return true;
@@ -257,7 +278,7 @@ public class MainActivity extends FragmentActivity {
     public void startChangeActivity() {
         Log.d(TAG, "startChangeActivity");
         Intent intent = new Intent(this, LocationActivity.class);
-        intent.putExtra("flag", "Main");
+        intent.putExtra(LocationActivity.FLAG, FROM_MAIN);
         startActivityForResult(intent, 1);
 //        finish();
     }
@@ -297,8 +318,6 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         Log.d(TAG, "onActivityResult");
-        MyListener currentWeatherListener = null;
-        MyListener forecastListener = null;
         switch (resultCode) {
             case 1:
                 final String city = intent.getStringExtra("city");
@@ -308,13 +327,6 @@ public class MainActivity extends FragmentActivity {
                 sNewData.urlStrForecast = sNewData.STR_FORECAST + "q=" + city + "&cnt=14";
                 sNewData.city = city;
 
-                Log.d(TAG, "mCity " + city);
-//                stop other queries
-                stopQuery();
-                Log.d(TAG, "request by city");
-
-                currentWeatherListener = new MyListener(sNewData, WeatherType.CURRENT_WEATHER, this);
-                forecastListener = new MyListener(sNewData, WeatherType.FORECAST, this);
 
                 break;
             case 2:
@@ -324,20 +336,12 @@ public class MainActivity extends FragmentActivity {
                 sNewData.urlStrDay = sNewData.STR_CURRENT_WEATHER + "lat=" + sNewData.lat + "&lon=" + sNewData.lon;
                 sNewData.urlStrForecast = sNewData.STR_FORECAST + "lat="
                         + sNewData.lat + "&lon=" + sNewData.lon + "&cnt=14";
-                Log.d(TAG, "request by lat and lon");
-//              stop other queries
-                stopQuery();
-                currentWeatherListener = new MyListener(sNewData, WeatherType.CURRENT_WEATHER, this);
-                forecastListener = new MyListener(sNewData, WeatherType.FORECAST, this);
+
                 break;
         }
 
-        Response.ErrorListener myErrorListener = new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // TODO Auto-generated method stub
-            }
-        };
+        MyListener currentWeatherListener = new MyListener(sNewData, WeatherType.CURRENT_WEATHER, this);
+        MyListener forecastListener = new MyListener(sNewData, WeatherType.FORECAST, this);
 
         mCurrentWeatherRequest = new JsonObjectRequest(
                 Request.Method.GET, sNewData.urlStrDay, (String) null, currentWeatherListener, myErrorListener);
@@ -352,7 +356,7 @@ public class MainActivity extends FragmentActivity {
     public void loadAnimationStart() {
         // start loading animation
         if (!mRefreshAnim) {
-            Log.d("anim", "animation successful start ");
+            Log.d(TAG, "animation successful start ");
             mRefreshAnim = true;
             supportInvalidateOptionsMenu();
         }
@@ -361,7 +365,7 @@ public class MainActivity extends FragmentActivity {
     public void loadAnimationStop() {
         // stop loading animation
         if (mRefreshAnim) {
-            Log.d("anim", "animation successful stop");
+            Log.d(TAG, "animation successful stop");
             mRefreshAnim = false;
             supportInvalidateOptionsMenu();
         }
