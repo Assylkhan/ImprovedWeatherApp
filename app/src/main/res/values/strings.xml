@@ -13,8 +13,8 @@
     <string name="forecast">прогноз</string>
     <string name="writeCrd">координаты (шир. и долг.) </string>
     <string name="London">Minsk</string>
-    <string name="lat">46.99</string>
-    <string name="lon">32</string>
+    <string name="latSample">46.99</string>
+    <string name="lonSample">32</string>
     <string name="temperatureDN"> температура днем/ночью</string>
     <string name="description">описание</string>
     <string name="enterYourCityHere">введите свой город</string>
@@ -110,5 +110,17 @@
     <string name="d961"> сильный шторм</string>
     <string name="d962"> ураган</string>
     <string name="title_activity_location">LocationActivity</string>
+    <string name="latitude">широта</string>
+    <string name="longitude">долгота</string>
+    <string name="mediumText">Medium Text</string>
+    <string name="largeText">Large Text</string>
+    <string name="button">Button</string>
+    <string name="morning">утро</string>
+    <string name="day">день</string>
+    <string name="eve">вечер</string>
+    <string name="night">ночь</string>
+    <string name="textView">TextView</string>
+    <string name="chooseCity">выбрать город</string>
+    <string name="updateData">обновить данные</string>
 
 </resources>

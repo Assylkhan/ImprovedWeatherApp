@@ -8,7 +8,7 @@
             android:layout_width="0dp"
             android:layout_height="2dp"
             android:layout_weight="1"
-            android:text="Button"
+            android:text="@string/button"
             android:visibility="invisible"/>
     <LinearLayout
             android:layout_width="0dp"
@@ -24,28 +24,28 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="утро"/>
+                    android:text="@string/morning"/>
 
             <TextView
                     android:id="@+id/day"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="день"/>
+                    android:text="@string/day"/>
 
             <TextView
                     android:id="@+id/evening"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="вечер"/>
+                    android:text="@string/eve"/>
 
             <TextView
                     android:id="@+id/night"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="ночь"/>
+                    android:text="@string/night"/>
         </LinearLayout>
 
         <LinearLayout
@@ -57,7 +57,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Large Text"
+                    android:text="@string/largeText"
                     android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             <TextView
@@ -65,7 +65,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Large Text"
+                    android:text="@string/largeText"
                     android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             <TextView
@@ -73,7 +73,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Large Text"
+                    android:text="@string/largeText"
                     android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             <TextView
@@ -81,7 +81,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Large Text"
+                    android:text="@string/largeText"
                     android:textAppearance="?android:attr/textAppearanceMedium"/>
         </LinearLayout>
         <TextView

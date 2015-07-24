@@ -6,7 +6,7 @@
             android:id="@+id/editCity"
             android:showAsAction="always"
             android:icon="@android:drawable/ic_menu_edit"
-            android:title="выбрать город">
+            android:title="@string/chooseCity">
     </item>
     <item
             android:id="@+id/refresh"
@@ -14,7 +14,7 @@
             android:showAsAction="always"
 
             android:icon="@drawable/ic_menu_refresh"
-            android:title="обновить данные">
+            android:title="@string/updateData">
     </item>
 
 </menu>

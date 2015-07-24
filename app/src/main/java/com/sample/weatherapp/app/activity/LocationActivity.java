@@ -161,9 +161,13 @@ public class LocationActivity extends FragmentActivity implements OnClickListene
 
             @Override
             public void onMapClick(LatLng latLng) {
-                mMapLat = String.valueOf(latLng.latitude);
-                mMapLon = String.valueOf(latLng.longitude);
-                final LatLng PERTH = new LatLng(Double.valueOf(mMapLat), Double.valueOf(mMapLon));
+                mMapLat = Location.convert(latLng.latitude, Location.FORMAT_DEGREES);
+                try {
+                    mMapLon = Location.convert(latLng.longitude, Location.FORMAT_DEGREES);
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
+                }
+                final LatLng PERTH = new LatLng(latLng.latitude, latLng.longitude);
                 Marker perth = mMap.addMarker(new MarkerOptions()
                         .position(PERTH)
                         .draggable(true));

@@ -20,7 +20,7 @@
                 android:id="@+id/city"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Medium Text"
+                android:text="@string/mediumText"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <ImageView
@@ -33,33 +33,33 @@
                 android:id="@+id/temperature"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Large Text"
+                android:text="@string/largeText"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
                 android:id="@+id/description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Medium Text"
+                android:text="@string/mediumText"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
                 android:id="@+id/windSpeed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="@string/textView" />
 
         <TextView
                 android:id="@+id/humidity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="@string/textView" />
 
         <TextView
                 android:id="@+id/pressure"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="@string/textView" />
     </LinearLayout>
 
     <ProgressBar

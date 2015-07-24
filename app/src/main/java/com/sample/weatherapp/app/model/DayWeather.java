@@ -261,7 +261,7 @@ public class DayWeather {
         main.setHumidity(context.getString(R.string.humidity) + String.valueOf(main.getHumidity())
                 + context.getString(R.string.percent));
         wind.setSpeed(context.getString(R.string.wind) + " " +
-                context.getString(WeatherUtil.windDir(Integer.valueOf(wind.getDeg()))) + " "
+                context.getString(WeatherUtil.windDir((int) (double) Double.valueOf(wind.getDeg()))) + " "
                 + wind.getSpeed() + " "  +  context.getString(R.string.speedUnit));
         weather.get(0).setDescription(context.getString(context.getResources().getIdentifier(
                 "d" + String.valueOf(weather.get(0).getId()), "string",

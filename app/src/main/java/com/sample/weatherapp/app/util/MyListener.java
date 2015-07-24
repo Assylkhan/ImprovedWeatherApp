@@ -50,7 +50,7 @@ public class MyListener<JSONObject> implements Response.Listener<JSONObject> {
 
         // save title to refresh data next time
         if (mMainActivity.sNewData.city == null)
-            mMainActivity.sNewData.title = mMainActivity.sNewData.lat + " " + mMainActivity.sNewData.lon;
+            mMainActivity.sNewData.title = mMainActivity.sNewData.lat + " : " + mMainActivity.sNewData.lon;
         else mMainActivity.sNewData.title = mMainActivity.sNewData.city;
 
         SharedPreferences.Editor editor = mMainActivity.mSettings.edit();
