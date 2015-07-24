@@ -48,10 +48,9 @@ public class FragmentNow extends Fragment {
         mLL = (LinearLayout) myFragmentView.findViewById(R.id.FNLinearL);
         mLL.setVisibility(View.GONE);
         mProgressBar = (ProgressBar) myFragmentView.findViewById(R.id.FNProgressBar);
-        if (null != MainActivity.sNewData.getNowWeather()) {
+        if ((mDw = MainActivity.sNewData.getNowWeather()) != null) {
 
             Log.d(GREG, "get data");
-            mDw = MainActivity.sNewData.getNowWeather();
 
             Log.d(GREG, "FragmentNow post.run setText");
 
@@ -65,8 +64,8 @@ public class FragmentNow extends Fragment {
             mHumidity = (TextView) myFragmentView.findViewById(R.id.humidity);
             mPressure = (TextView) myFragmentView.findViewById(R.id.pressure);
 
-            mCity.setText(mDw.getName());
-            mImWeatherIcon.setImageResource(mDw.getWeather().get(0).getIcon());
+            mCity.setText(MainActivity.sNewData.title);
+            mImWeatherIcon.setImageResource(Integer.valueOf(mDw.getWeather().get(0).getIcon()));
             mTemperature.setText(mDw.getMain().getTemp() + "C");
             mDescript.setText(mDw.getWeather().get(0).getDescription());
             mWindSpeed.setText(mDw.getWind().getSpeed().toString());

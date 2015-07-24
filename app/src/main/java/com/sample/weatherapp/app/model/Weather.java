@@ -7,7 +7,7 @@ public class Weather {
     private Integer id;
     private String main;
     private String description;
-    private int icon;
+    private String icon;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
@@ -69,7 +69,7 @@ public class Weather {
      * @return
      * The icon
      */
-    public int getIcon() {
+    public String getIcon() {
         return icon;
     }
 
@@ -78,7 +78,7 @@ public class Weather {
      * @param icon
      * The icon
      */
-    public void setIcon(int icon) {
+    public void setIcon(String icon) {
         this.icon = icon;
     }
 

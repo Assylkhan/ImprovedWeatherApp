@@ -35,6 +35,8 @@ public class MainActivity extends FragmentActivity {
     public static final String TAG = "mainActivity";
     public static final int PAGE_COUNT = 2;
     public static final boolean FROM_MAIN = true;
+    public static final int SEARCH_BY_CITY = 1;
+    public static final int SEARCH_BY_COORDINATES = 2;
 
     public static Data sNewData;
 //    todo: from friendly to private
@@ -288,7 +290,7 @@ public class MainActivity extends FragmentActivity {
         if (null == sNewData.urlStrForecast || null == sNewData.urlStrDay
                 || null == sNewData.title) {
 
-            Toast.makeText(this, "�������� �����", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Не указано место", Toast.LENGTH_LONG).show();
 
             return;
         }
@@ -319,20 +321,22 @@ public class MainActivity extends FragmentActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         Log.d(TAG, "onActivityResult");
         switch (resultCode) {
-            case 1:
+            case SEARCH_BY_CITY:
                 final String city = intent.getStringExtra("city");
 
                 // save query string and title to refresh data next time
                 sNewData.urlStrDay = sNewData.STR_CURRENT_WEATHER + "q=" + city;
                 sNewData.urlStrForecast = sNewData.STR_FORECAST + "q=" + city + "&cnt=14";
                 sNewData.city = city;
-
+                sNewData.lat = null;
+                sNewData.lon = null;
 
                 break;
-            case 2:
+            case SEARCH_BY_COORDINATES:
                 // start new query with coordinate
                 sNewData.lat = intent.getStringExtra("lat");
                 sNewData.lon = intent.getStringExtra("lon");
+                sNewData.city = null;
                 sNewData.urlStrDay = sNewData.STR_CURRENT_WEATHER + "lat=" + sNewData.lat + "&lon=" + sNewData.lon;
                 sNewData.urlStrForecast = sNewData.STR_FORECAST + "lat="
                         + sNewData.lat + "&lon=" + sNewData.lon + "&cnt=14";

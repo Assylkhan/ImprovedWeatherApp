@@ -269,6 +269,6 @@ public class DayWeather {
         int drawable = context.getResources().getIdentifier(
                 "w_" + weather.get(0).getIcon(), "drawable",
                 context.getPackageName());
-        weather.get(0).setIcon(drawable);
+        weather.get(0).setIcon(String.valueOf(drawable));
     }
 }

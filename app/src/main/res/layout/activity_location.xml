@@ -1,54 +1,79 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/parentScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:tools="http://schemas.android.com/tools"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:orientation="vertical"
+                  tools:context="com.sample.weatherapp.app.activity.LocationActivity"
+                  android:weightSum="1">
+
+
+        <AutoCompleteTextView
+                android:id="@+id/autoCompleteCity"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                tools:context="com.sample.weatherapp.app.activity.LocationActivity">
+                android:layout_height="wrap_content"
+                android:completionThreshold="1"
+                android:ems="10"
+                android:hint="@string/enterYourCityHere"
+                android:singleLine="true"
+                android:inputType="text"
+                />
 
-    <AutoCompleteTextView
-            android:id="@+id/autoCompleteCity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:completionThreshold="1"
-            android:ems="10"
-            android:hint="@string/enterYourCityHere"
-            android:singleLine="true"
-            android:inputType="text"
-            />
-
-    <Button
-            android:id="@+id/btnSearchByCity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text= "@string/searchByCity" />
-
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-
-        <EditText
-                android:id="@+id/editLat"
+        <Button
+                android:id="@+id/btnSearchByCity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:hint="широта"
-                android:inputType="numberDecimal"/>
+                android:text="@string/searchByCity"/>
 
-        <EditText
-                android:id="@+id/editLon"
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <EditText
+                    android:id="@+id/editLat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="широта"
+                    android:inputType="numberDecimal"/>
+
+            <EditText
+                    android:id="@+id/editLon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="долгота"
+                    android:inputType="numberDecimal"/>
+        </LinearLayout>
+
+        <Button
+                android:id="@+id/btnSearchByCrd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:hint="долгота"
-                android:inputType="numberDecimal"/>
+                android:text="@string/searchByCoordinates"/>
+
+        <com.sample.weatherapp.app.activity.MapContainerLayout android:layout_width="match_parent"
+                                                               android:layout_height="wrap_content">
+
+            <fragment
+                    android:id="@+id/map"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp">
+            </fragment>
+
+        </com.sample.weatherapp.app.activity.MapContainerLayout>
+
+        <Button
+                android:id="@+id/btnSearchByMap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/searchByMap"/>
+
     </LinearLayout>
-
-    <Button
-            android:id="@+id/btnSearchByCrd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/searchByCoordinates" />
-
-</LinearLayout>
+</ScrollView>

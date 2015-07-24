@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.Log;
@@ -12,29 +13,38 @@ import android.view.Gravity;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.sample.improvedweatherapp.app.R;
 import com.sample.weatherapp.app.util.GPSTracker;
 
-public class LocationActivity extends Activity implements OnClickListener, LocationListener {
+public class LocationActivity extends FragmentActivity implements OnClickListener, LocationListener {
 
-    private final String GREG = "LocationActivity";
+    private static final String TAG = "LocationActivity";
+    public static final int SEARCH_BY_CITY = 1;
+    public static final int SEARCH_BY_COORDINATES = 2;
     public static final String FLAG = "flag";
+    public SharedPreferences mSettings;
     private Activity mLocationActivity = this;
     private AutoCompleteTextView mTvEnterCity;
     private EditText mLat;
     private EditText mLon;
+    private String mMapLat;
+    private String mMapLon;
     private LocationManager mLocationManager;
     private String mProvider;
     private GPSTracker mGps;
     private boolean mFromMain;
-    public SharedPreferences mSettings;
+    private SupportMapFragment mapFragment;
+    private GoogleMap mMap;
 
-//    public static Intent createIntent(Context context, int flag) { // flag - public static final int в LocationActivity
-//        return new Intent(context, LocationActivity.class).putExtra(EXTRA_FLAG, flag);
-//    }
 
     private String formatLocation(Location location) {
         if (location == null) return "";
@@ -48,7 +58,7 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(GREG, "onCreate");
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
 
@@ -73,6 +83,8 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
             String city = mSettings.getString("city", null);
             String lat = mSettings.getString("lat", null);
             String lon = mSettings.getString("lon", null);
+            mMapLat = lat;
+            mMapLon = lon;
             if (city != null && !city.isEmpty()) {
                 mTvEnterCity.setText(city);
             } else {
@@ -114,8 +126,27 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
             mLat.setText(Double.toString(mGps.getLatitude()));
             mLon.setText(String.valueOf(mGps.getLongitude()));
         }*/
+
+        try {
+
+            mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
+            mMap = mapFragment.getMap();
+            if (mMap == null) {
+                finish();
+                return;
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+
+        initMap();
+
         Button btnSearchByCrd = (Button) findViewById(R.id.btnSearchByCrd);
         btnSearchByCrd.setOnClickListener(this);
+
+        Button btnSearchByMap = (Button) findViewById(R.id.btnSearchByMap);
+        btnSearchByMap.setOnClickListener(this);
     }
 
     public void onLocationChanged(Location location) {
@@ -123,6 +154,24 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
         int longitude = (int) (location.getLongitude());
         mLat.setText(String.valueOf(latitude));
         mLon.setText(String.valueOf(longitude));
+    }
+
+    private void initMap() {
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+
+            @Override
+            public void onMapClick(LatLng latLng) {
+                mMapLat = String.valueOf(latLng.latitude);
+                mMapLon = String.valueOf(latLng.longitude);
+                final LatLng PERTH = new LatLng(Double.valueOf(mMapLat), Double.valueOf(mMapLon));
+                Marker perth = mMap.addMarker(new MarkerOptions()
+                        .position(PERTH)
+                        .draggable(true));
+
+                Toast.makeText(LocationActivity.this, "Место выбрано", Toast.LENGTH_LONG).show();
+                Log.d(TAG, "onMapClick: " + mMapLat + "," + mMapLon);
+            }
+        });
     }
 
     @Override
@@ -155,7 +204,7 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
 
     @Override
     public void onClick(View v) {
-        Intent intent = null;
+        Intent intent;
         if (mFromMain) intent = new Intent();
         else intent = new Intent(this, MainActivity.class);
         switch (v.getId()) {
@@ -165,9 +214,9 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
                     mTvEnterCity.setError("заполните поле");
                     return;
                 }
-                Log.d(GREG, "read city " + city);
+                Log.d(TAG, "read city " + city);
                 intent.putExtra("city", city);
-                setResult(1, intent);
+                setResult(SEARCH_BY_CITY, intent);
                 break;
             case R.id.btnSearchByCrd:
                 String lat = this.mLat.getText().toString();
@@ -181,10 +230,15 @@ public class LocationActivity extends Activity implements OnClickListener, Locat
                 if (lat == null || lat.isEmpty() || lon == null || lon.isEmpty()) {
                     return;
                 }
-                Log.d(GREG, "read mLat " + lat + "mLon " + lon);
-                intent.putExtra("mLat", lat);
-                intent.putExtra("mLon", lon);
-                setResult(2, intent);
+                Log.d(TAG, "read mLat " + lat + "mLon " + lon);
+                intent.putExtra("lat", lat);
+                intent.putExtra("lon", lon);
+                setResult(SEARCH_BY_COORDINATES, intent);
+                break;
+            case R.id.btnSearchByMap:
+                intent.putExtra("lat", mMapLat);
+                intent.putExtra("lon", mMapLon);
+                setResult(SEARCH_BY_COORDINATES, intent);
                 break;
         }
         if (!mFromMain) startActivity(intent);
